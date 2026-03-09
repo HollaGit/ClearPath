@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StateForward — Legacy Modernization with AWS</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0b1220;
+    --navy-mid: #111d30;
+    --navy-light: #182640;
+    --border: rgba(255,255,255,0.07);
+    --amber: #e8a020;
+    --amber-dim: rgba(232,160,32,0.15);
+    --amber-glow: rgba(232,160,32,0.06);
+    --sky: #4a9ede;
+    --sky-dim: rgba(74,158,222,0.12);
+    --text: #d4dbe8;
+    --text-muted: #7a8ba0;
+    --white: #f0f4f8;
+    --green: #3dba7e;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--navy);
+    color: var(--text);
+    font-family: 'Libre Baskerville', Georgia, serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Grain overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.4;
+  }
+
+  /* Subtle grid background */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: 
+      linear-gradient(rgba(74,158,222,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(74,158,222,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .page {
+    position: relative;
+    z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px 32px 60px;
+  }
+
+  /* ─── HEADER ─── */
+  header {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: start;
+    gap: 24px;
+    padding-bottom: 36px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 44px;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .brand-mark {
+    width: 42px;
+    height: 42px;
+    border: 1.5px solid var(--amber);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  .brand-mark::before {
+    content: '';
+    position: absolute;
+    inset: 4px;
+    background: var(--amber-dim);
+  }
+
+  .brand-mark svg { position: relative; z-index: 1; }
+
+  .brand-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.5rem;
+    letter-spacing: -0.01em;
+    color: var(--white);
+  }
+
+  .brand-name span { color: var(--amber); }
+
+  .header-badges {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    background: rgba(255,255,255,0.02);
+  }
+
+  .badge.highlight {
+    border-color: var(--amber);
+    color: var(--amber);
+    background: var(--amber-dim);
+  }
+
+  /* ─── HEADLINE ─── */
+  .headline-block {
+    margin-bottom: 48px;
+    animation: fadeUp 0.6s 0.1s ease both;
+  }
+
+  .eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 14px;
+  }
+
+  h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2rem, 4.5vw, 3.2rem);
+    line-height: 1.1;
+    color: var(--white);
+    letter-spacing: -0.02em;
+    max-width: 720px;
+    margin-bottom: 20px;
+  }
+
+  h1 em {
+    font-style: italic;
+    color: var(--sky);
+  }
+
+  .subhead {
+    font-size: 0.95rem;
+    line-height: 1.75;
+    color: var(--text-muted);
+    max-width: 580px;
+  }
+
+  /* ─── PROBLEM STRIP ─── */
+  .problem-strip {
+    background: linear-gradient(135deg, rgba(232,160,32,0.06) 0%, transparent 60%);
+    border: 1px solid rgba(232,160,32,0.2);
+    border-left: 3px solid var(--amber);
+    padding: 20px 28px;
+    margin-bottom: 48px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+    animation: fadeUp 0.6s 0.15s ease both;
+  }
+
+  .problem-strip:hover {
+    background: linear-gradient(135deg, rgba(232,160,32,0.1) 0%, transparent 60%);
+    border-color: var(--amber);
+  }
+
+  .problem-strip .ps-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--amber);
+    white-space: nowrap;
+    min-width: 80px;
+  }
+
+  .problem-strip .ps-divider {
+    width: 1px;
+    height: 28px;
+    background: rgba(232,160,32,0.3);
+    flex-shrink: 0;
+  }
+
+  .problem-strip .ps-text {
+    font-size: 0.85rem;
+    color: var(--text);
+    font-style: italic;
+    line-height: 1.6;
+  }
+
+  .problem-strip .ps-cta {
+    margin-left: auto;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    color: var(--amber);
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .ps-cta::after { content: '→'; }
+
+  /* ─── OFFERING GRID ─── */
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+  }
+
+  .offering-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 48px;
+    animation: fadeUp 0.6s 0.2s ease both;
+  }
+
+  .offer-card {
+    background: var(--navy-mid);
+    border: 1px solid var(--border);
+    padding: 28px 24px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .offer-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    transition: opacity 0.25s;
+    opacity: 0;
+  }
+
+  .offer-card:nth-child(1)::before { background: var(--amber); }
+  .offer-card:nth-child(2)::before { background: var(--sky); }
+  .offer-card:nth-child(3)::before { background: var(--green); }
+
+  .offer-card:hover {
+    border-color: rgba(255,255,255,0.15);
+    transform: translateY(-3px);
+    background: var(--navy-light);
+  }
+
+  .offer-card:hover::before { opacity: 1; }
+
+  .card-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.15em;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+  }
+
+  .card-icon {
+    width: 36px;
+    height: 36px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .card-icon svg { width: 100%; height: 100%; }
+
+  .card-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.15rem;
+    color: var(--white);
+    line-height: 1.2;
+    margin-bottom: 10px;
+  }
+
+  .card-tagline {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+    font-style: italic;
+  }
+
+  .card-footer {
+    margin-top: 20px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .card-phase {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+  }
+
+  .card-arrow {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    transition: transform 0.2s, color 0.2s;
+  }
+
+  .offer-card:hover .card-arrow { transform: translate(3px, -3px); color: var(--white); }
+
+  /* ─── DIFFERENTIATION ROW ─── */
+  .diff-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 48px;
+    animation: fadeUp 0.6s 0.25s ease both;
+  }
+
+  .diff-card {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    padding: 18px 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .diff-card:hover {
+    background: rgba(255,255,255,0.04);
+    border-color: rgba(255,255,255,0.12);
+  }
+
+  .diff-card .diff-icon {
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+  }
+
+  .diff-card .diff-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.05em;
+    color: var(--white);
+    margin-bottom: 6px;
+  }
+
+  .diff-card .diff-text {
+    font-size: 0.73rem;
+    color: var(--text-muted);
+    line-height: 1.55;
+  }
+
+  /* ─── BUYER TABLE ─── */
+  .buyer-section {
+    margin-bottom: 48px;
+    animation: fadeUp 0.6s 0.3s ease both;
+  }
+
+  .buyer-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .buyer-table tr {
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .buyer-table tr:hover { background: rgba(255,255,255,0.02); }
+
+  .buyer-table td {
+    padding: 14px 16px;
+    font-size: 0.82rem;
+    vertical-align: middle;
+  }
+
+  .buyer-table td:first-child {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.05em;
+    color: var(--amber);
+    width: 180px;
+    white-space: nowrap;
+  }
+
+  .buyer-table td:last-child {
+    color: var(--text-muted);
+    font-style: italic;
+    border-left: 1px solid var(--border);
+  }
+
+  /* ─── FOOTER ─── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding-top: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    animation: fadeUp 0.6s 0.35s ease both;
+  }
+
+  .footer-left {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+  }
+
+  .footer-right {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .aws-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.08em;
+    color: var(--sky);
+    border: 1px solid rgba(74,158,222,0.3);
+    padding: 4px 10px;
+    background: var(--sky-dim);
+  }
+
+  /* ─── MODAL ─── */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(7,12,22,0.85);
+    backdrop-filter: blur(8px);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s;
+  }
+
+  .modal-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .modal {
+    background: var(--navy-mid);
+    border: 1px solid rgba(255,255,255,0.1);
+    max-width: 680px;
+    width: 100%;
+    max-height: 85vh;
+    overflow-y: auto;
+    position: relative;
+    transform: translateY(16px) scale(0.98);
+    transition: transform 0.25s;
+  }
+
+  .modal-overlay.active .modal { transform: translateY(0) scale(1); }
+
+  .modal-top {
+    padding: 28px 28px 0;
+    position: sticky;
+    top: 0;
+    background: var(--navy-mid);
+    z-index: 1;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 20px;
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 30px;
+    height: 30px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+  }
+
+  .modal-close:hover {
+    border-color: var(--white);
+    color: var(--white);
+  }
+
+  .modal-body {
+    padding: 28px;
+  }
+
+  .modal-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .modal-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.6rem;
+    color: var(--white);
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    margin-bottom: 6px;
+  }
+
+  .modal-subtitle {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    font-style: italic;
+  }
+
+  .modal-section {
+    margin-top: 24px;
+  }
+
+  .modal-section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+  }
+
+  .modal-text {
+    font-size: 0.85rem;
+    line-height: 1.75;
+    color: var(--text);
+  }
+
+  .modal-list {
+    list-style: none;
+    margin-top: 10px;
+  }
+
+  .modal-list li {
+    font-size: 0.83rem;
+    line-height: 1.6;
+    color: var(--text);
+    padding: 8px 0 8px 20px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+  }
+
+  .modal-list li:last-child { border-bottom: none; }
+
+  .modal-list li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+  }
+
+  .modal-metric-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 16px;
+  }
+
+  .modal-metric {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    padding: 14px;
+    text-align: center;
+  }
+
+  .modal-metric .m-val {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.6rem;
+    color: var(--white);
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .modal-metric .m-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+  }
+
+  .tag-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.07em;
+    padding: 4px 10px;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    background: rgba(255,255,255,0.02);
+  }
+
+  .tag.accent { border-color: var(--amber); color: var(--amber); background: var(--amber-dim); }
+  .tag.sky { border-color: var(--sky); color: var(--sky); background: var(--sky-dim); }
+  .tag.green { border-color: var(--green); color: var(--green); background: rgba(61,186,126,0.1); }
+
+  /* ─── ANIMATIONS ─── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 768px) {
+    .offering-grid { grid-template-columns: 1fr; }
+    .diff-row { grid-template-columns: 1fr 1fr; }
+    header { grid-template-columns: 1fr; }
+    .header-badges { justify-content: flex-start; }
+    h1 { font-size: 1.8rem; }
+    .modal-metric-row { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- HEADER -->
+  <header>
+    <div class="brand">
+      <div class="brand-mark">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <path d="M9 2L16 14H2L9 2Z" stroke="#e8a020" stroke-width="1.2" fill="none"/>
+          <path d="M9 6L13 12H5L9 6Z" fill="#e8a020" opacity="0.4"/>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-name">State<span>Forward</span></div>
+      </div>
+    </div>
+    <div class="header-badges">
+      <span class="badge highlight">AWS Partner</span>
+      <span class="badge">SLED Practice</span>
+      <span class="badge">AI-Accelerated Delivery</span>
+    </div>
+  </header>
+
+  <!-- HEADLINE -->
+  <div class="headline-block">
+    <div class="eyebrow">End-to-End Modernization Services · Western US State Agencies</div>
+    <h1>Legacy systems are costing you<br><em>more than money.</em></h1>
+    <p class="subhead">We partner with AWS to help state agencies compress the path from aging core systems to a modern, value-sequenced application and data estate — using AI to collapse discovery timelines and behavioral science to protect adoption.</p>
+  </div>
+
+  <!-- PROBLEM STRIP -->
+  <div class="problem-strip" onclick="openModal('problem')">
+    <div class="ps-label">The Problem</div>
+    <div class="ps-divider"></div>
+    <div class="ps-text">70–80% of agency IT budgets maintain systems that cannot deliver on modern policy mandates, federal compliance requirements, or constituent service expectations — and most prior modernization attempts have failed.</div>
+    <div class="ps-cta">Explore the problem</div>
+  </div>
+
+  <!-- OFFERING CARDS -->
+  <div class="section-label">Our Three-Layer Offering</div>
+  <div class="offering-grid">
+
+    <div class="offer-card" onclick="openModal('discovery')">
+      <div class="card-num">01 / BEACHHEAD ENGAGEMENT</div>
+      <div class="card-icon">
+        <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="2" width="32" height="32" rx="0" stroke="#e8a020" stroke-width="1" opacity="0.3"/>
+          <path d="M8 28L14 18L20 22L28 10" stroke="#e8a020" stroke-width="1.5" stroke-linecap="round"/>
+          <circle cx="28" cy="10" r="2.5" fill="#e8a020" opacity="0.7"/>
+          <path d="M8 10H14M8 14H12M8 18H10" stroke="#e8a020" stroke-width="1" opacity="0.4"/>
+        </svg>
+      </div>
+      <div class="card-title">AI-Accelerated Discovery & Value Mapping</div>
+      <div class="card-tagline">Compress 18-month discovery into weeks. Produce a value-sequenced modernization roadmap before you commit to a platform.</div>
+      <div class="card-footer">
+        <span class="card-phase">Phase 1 · 60–90 days</span>
+        <span class="card-arrow">↗</span>
+      </div>
+    </div>
+
+    <div class="offer-card" onclick="openModal('architecture')">
+      <div class="card-num">02 / CORE DELIVERY</div>
+      <div class="card-icon">
+        <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="2" width="32" height="32" stroke="#4a9ede" stroke-width="1" opacity="0.3"/>
+          <rect x="7" y="14" width="8" height="8" stroke="#4a9ede" stroke-width="1.2" fill="none"/>
+          <rect x="21" y="14" width="8" height="8" stroke="#4a9ede" stroke-width="1.2" fill="rgba(74,158,222,0.15)"/>
+          <rect x="14" y="7" width="8" height="8" stroke="#4a9ede" stroke-width="1.2" fill="none" opacity="0.5"/>
+          <path d="M15 18H21M11 14V11H18M25 14V11H18" stroke="#4a9ede" stroke-width="1" opacity="0.6"/>
+        </svg>
+      </div>
+      <div class="card-title">Modern Cloud Architecture on AWS</div>
+      <div class="card-tagline">Strangler-fig refactoring into a modular, API-first estate on AWS GovCloud with a cloud-native data and AI layer.</div>
+      <div class="card-footer">
+        <span class="card-phase">Phase 2 · Rolling sprints</span>
+        <span class="card-arrow">↗</span>
+      </div>
+    </div>
+
+    <div class="offer-card" onclick="openModal('ocm')">
+      <div class="card-num">03 / CONTINUOUS DISCIPLINE</div>
+      <div class="card-icon">
+        <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="2" width="32" height="32" stroke="#3dba7e" stroke-width="1" opacity="0.3"/>
+          <circle cx="18" cy="15" r="5" stroke="#3dba7e" stroke-width="1.2" fill="none"/>
+          <path d="M10 28C10 23.58 13.58 20 18 20C22.42 20 26 23.58 26 28" stroke="#3dba7e" stroke-width="1.2" fill="none"/>
+          <path d="M22 13L24 11M26 9L24 11" stroke="#3dba7e" stroke-width="1" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="card-title">Behavioral OCM & Adoption as Product</div>
+      <div class="card-tagline">Adoption is not a training plan. We embed behavioral science and leading-indicator instrumentation into every delivery sprint.</div>
+      <div class="card-footer">
+        <span class="card-phase">Phase 1–3 · Continuous</span>
+        <span class="card-arrow">↗</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- DIFFERENTIATORS -->
+  <div class="section-label">Why We Win</div>
+  <div class="diff-row">
+
+    <div class="diff-card" onclick="openModal('diff-ai')">
+      <div class="diff-icon">⚡</div>
+      <div class="diff-title">AI-First Discovery</div>
+      <div class="diff-text">LLM-assisted code analysis, business rule extraction, and dependency mapping compresses the most expensive phase of modernization.</div>
+    </div>
+
+    <div class="diff-card" onclick="openModal('diff-strangler')">
+      <div class="diff-icon">🏗</div>
+      <div class="diff-title">No Big Bang Risk</div>
+      <div class="diff-text">Strangler-fig architecture means your legacy system stays in production while modern capabilities are built alongside it — incrementally.</div>
+    </div>
+
+    <div class="diff-card" onclick="openModal('diff-value')">
+      <div class="diff-icon">◎</div>
+      <div class="diff-title">Value-Sequenced Roadmap</div>
+      <div class="diff-text">We prioritize what to modernize first by constituent impact and operational pain, not technical convenience or vendor preference.</div>
+    </div>
+
+    <div class="diff-card" onclick="openModal('diff-aws')">
+      <div class="diff-icon">☁</div>
+      <div class="diff-title">AWS GovCloud Native</div>
+      <div class="diff-text">FedRAMP compliance, existing state procurement vehicles, and co-sell economics reduce friction from first conversation to contract.</div>
+    </div>
+
+  </div>
+
+  <!-- BUYER MESSAGES -->
+  <div class="buyer-section">
+    <div class="section-label">What We Say to Whom</div>
+    <table class="buyer-table">
+      <tr onclick="openModal('buyer-cio')">
+        <td>Agency CIO</td>
+        <td>We compress your path to a credible modernization roadmap using AI — without committing you to a platform before you know what you're buying.</td>
+      </tr>
+      <tr onclick="openModal('buyer-program')">
+        <td>Program Owner</td>
+        <td>We sequence modernization around your highest-value outcomes first, not around what's easiest to rebuild technically.</td>
+      </tr>
+      <tr onclick="openModal('buyer-cfo')">
+        <td>CFO / Procurement</td>
+        <td>We reduce the risk of another failed transformation by building value checkpoints into the engagement model — you fund milestones, not phases.</td>
+      </tr>
+      <tr onclick="openModal('buyer-aws')">
+        <td>AWS Partner Team</td>
+        <td>We extend your GovCloud footprint into the transformation layer that your account teams don't have capacity to deliver.</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-left">Pariveda Partners · SLED West Region · 2025</div>
+    <div class="footer-right">
+      <span class="aws-badge">AWS Advanced Partner</span>
+      <span class="badge">GovCloud Ready</span>
+    </div>
+  </footer>
+
+</div>
+
+
+<!-- MODAL OVERLAY -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
+  <div class="modal" id="modal">
+    <div class="modal-top">
+      <div class="modal-eyebrow" id="modalEyebrow"></div>
+      <div class="modal-title" id="modalTitle"></div>
+      <div class="modal-subtitle" id="modalSubtitle"></div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+
+<script>
+const modalData = {
+  problem: {
+    eyebrow: 'Context',
+    eyebrowColor: '#e8a020',
+    title: 'The Legacy Crisis in State Government',
+    subtitle: 'Why this moment is different from the last ten years',
+    body: `
+      <div class="modal-section">
+        <div class="modal-section-label">Core Problem Statement</div>
+        <p class="modal-text">Western US state agencies are operating on application estates built over 20–40 years. COBOL-based eligibility systems, monolithic case management platforms, and siloed data environments require armies of institutional knowledge holders to maintain — and that workforce is retiring. The knowledge cliff, not just the skills gap, is the real emergency.</p>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-label">Compounding Pressures</div>
+        <ul class="modal-list">
+          <li><strong>Policy mandate gap:</strong> Real-time status, mobile access, and federal interoperability cannot be delivered on systems requiring batch processing and manual reconciliation.</li>
+          <li><strong>Cost structure mismatch:</strong> 70–80% of IT budgets consumed by maintenance leaves no capital for transformation — the systems cost the most and deliver the least per dollar.</li>
+          <li><strong>Risk accumulation:</strong> Security posture, audit exposure, and compliance gaps compound annually on unsupported platforms. For agencies managing Medicaid, child welfare, or public benefits, this is existential.</li>
+          <li><strong>Failed transformation trauma:</strong> Most western states have a graveyard of abandoned ERP and modernization programs. This creates institutional skepticism and very low political risk tolerance for another large commitment.</li>
+        </ul>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-label">Why Now</div>
+        <p class="modal-text">Federal funding through IRA, IIJA, and CMS/ACF waivers is creating capital tied directly to technology modernization as a condition of program compliance. Agencies have money but lack a credible execution model. AI changes the economics of the one thing that has always killed these programs: the cost and time of discovery.</p>
+      </div>
+      <div class="modal-metric-row">
+        <div class="modal-metric"><span class="m-val">70–80%</span><span class="m-label">IT budget on maintenance</span></div>
+        <div class="modal-metric"><span class="m-val">18–24mo</span><span class="m-label">Typical discovery phase</span></div>
+        <div class="modal-metric"><span class="m-val">&gt;60%</span><span class="m-label">State modernization programs fail or stall</span></div>
+      </div>
+    `
+  },
+  discovery: {
+    eyebrow: 'Offering Layer 01 · Beachhead Engagement',
+    eyebrowColor: '#e8a020',
+    title: 'AI-Accelerated Discovery & Value Mapping',
+    subtitle: '60–90 day engagement that produces the artifact that justifies everything else',
+    body: `
+      <div class="modal-section">
+        <div class="modal-section-label">What It Is</div>
+        <p class="modal-text">We use LLM-assisted tooling to analyze legacy codebases, extract embedded business rules, map data flows, and catalog integration dependencies. The output is a living application inventory tied to business capability and constituent impact — not a static spreadsheet.</p>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-label">What We Deliver</div>
+        <ul class="modal-list">
+          <li>AI-generated application and data estate inventory with capability-to-system mapping</li>
+          <li>Value-sequenced modernization roadmap prioritized by operational pain, constituent impact, and risk yield</li>
+          <li>Technical debt heat map with cost-of-carry analysis</li>
+          <li>Preliminary AWS target architecture options with rough order-of-magnitude investment ranges</li>
+          <li>Business case narrative structured for executive and procurement audiences</li>
+        </ul>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-label">Why It Works as a Beachhead</div>
+        <p class="modal-text">The Discovery engagement is fundable from discretionary IT budget or existing contract vehicles. It avoids the 18-month procurement cycle. It produces a tangible, politically shareable deliverable within a single quarter — and it creates the artifact that justifies Phase 2 funding without requiring a leap of faith.</p>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-label">Key Capabilities We Bring</div>
+        <div class="tag-row">
+          <span class="tag accent">LLM Code Analysis</span>
+          <span class="tag accent">Business Rule Extraction</span>
+          <span class="tag">Data Flow Mapping</span>
+          <span class="tag">Capability Modeling</span>
+          <span class="tag">Value Mapping</span>
+          <span class="tag">Business Case Development</span>
+        </div>
+      </div>
+    `
+  },
+  architecture: {
+    eyebrow: 'Offering Layer 02 · Core Delivery',
+    eyebrowColor: '#4a9ede',
+    title: 'Modern Cloud Architecture on AWS',
+    subtitle: 'Modular, API-first refactoring with a cloud-native data and AI layer',
+    body: `
+      <div class="modal-section">
+        <div class="modal-section-label">Architectural Philosophy</div>
+        <p class="modal-text">We do not replace — we refactor and strangle. The legacy system remains in production while modern capabilities are built alongside it. Each domain is migrated when it is ready, using value-sequenced prioritization from Phase 1. This is the single most important risk mitigation in state modernization.</p>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-label">Platform Components</div>
+        <ul class="modal-list">
+          <li><strong>AWS GovCloud:</strong> FedRAMP-authorized infrastructure base, aligned to state security requirements and existing procurement vehicles</li>
+          <li><strong>Lakehouse Data Foundation:</strong> Cloud-native data layer enabling analytics, reporting, and federal data exchange — built to absorb future use cases without re-architecture</li>
+          <li><strong>API-First Application Layer:</strong> Modular services with clean separation of concerns, enabling incremental replacement without downstream disruption</li>
+          <li><strong>AI-Ready Infrastructure:</strong> Amazon Bedrock integration for future use cases — fraud detection, caseload prediction, constituent self-service, document intelligence</li>
+          <li><strong>Integration Hub:</strong> Managed event-driven integration layer replacing brittle point-to-point connections between legacy systems and external data sources</li>
+        </ul>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-label">Delivery Model</div>
+        <p class="modal-text">Product-managed sprint teams aligned to business capability domains, not technology layers. Each sprint produces a measurable business outcome, not just a technical milestone. Value checkpoints are built into the engagement structure — the agency funds milestones, not phases.</p>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-label">AWS Services We Architect Around</div>
+        <div class="tag-row">
+          <span class="tag sky">GovCloud</span>
+          <span class="tag sky">S3 / Lake Formation</span>
+          <span class="tag sky">Glue / Athena</span>
+          <span class="tag sky">Bedrock</span>
+          <span class="tag">API Gateway</span>
+          <span class="tag">Lambda / ECS</span>
+          <span class="tag">EventBridge</span>
+          <span class="tag">RDS / Aurora</span>
+        </div>
+      </div>
+    `
+  },
+  ocm: {
+    eyebrow: 'Offering Layer 03 · Continuous Discipline',
+    eyebrowColor: '#3dba7e',
+    title: 'Behavioral OCM & Adoption as Product',
+    subtitle: 'Change management that treats adoption as a measurable product outcome',
+    body: `
+      <div class="modal-section">
+        <div class="modal-section-label">Why Traditional OCM Fails</div>
+        <p class="modal-text">Conventional change management produces communication plans and training curricula bolted onto a go-live event. It treats human adoption as a communication problem. The result is a technically functional system that staff route around, constituents can't navigate, and leadership cannot measure.</p>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-label">Our Approach</div>
+        <ul class="modal-list">
+          <li><strong>Adoption as a product discipline:</strong> Change KPIs are instrumented the same way system performance is — leading indicators, not just lagging satisfaction surveys</li>
+          <li><strong>Behavioral economics applied:</strong> We design for how people actually behave, not how the project plan assumes they will. Default states, friction reduction, and choice architecture baked into UX and workflow</li>
+          <li><strong>Continuous sprint integration:</strong> OCM practitioners embedded in delivery teams, not running a parallel workstream. Change readiness is assessed per sprint, per capability domain</li>
+          <li><strong>Stakeholder segmentation:</strong> Persona-level change impact modeling — frontline workers, supervisors, constituents, and policy staff have different adoption profiles and need different interventions</li>
+          <li><strong>Resistance early warning:</strong> Structured feedback loops and sentiment tracking surface adoption risk before it becomes a go-live crisis</li>
+        </ul>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-label">Capabilities We Bring</div>
+        <div class="tag-row">
+          <span class="tag green">Behavioral Science</span>
+          <span class="tag green">Human-Centered Design</span>
+          <span class="tag">Adoption Instrumentation</span>
+          <span class="tag">Stakeholder Segmentation</span>
+          <span class="tag">Sprint-Embedded OCM</span>
+          <span class="tag">Training Design</span>
+        </div>
+      </div>
+    `
+  },
+  'diff-ai': {
+    eyebrow: 'Differentiator',
+    eyebrowColor: '#e8a020',
+    title: 'AI-First Discovery',
+    subtitle: 'The economics of legacy modernization have fundamentally changed',
+    body: `
+      <div class="modal-section">
+        <p class="modal-text">Historically, application discovery and legacy code analysis was the most expensive and slowest phase of modernization — often 18–24 months before a single line of new code was written. This cost was both financial and political: by the time a roadmap was ready, project sponsors had changed and momentum was lost.</p>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-label">What AI Changes</div>
+        <ul class="modal-list">
+          <li>LLM-assisted codebase analysis reads and interprets legacy COBOL, PL/I, and custom languages in days, not months</li>
+          <li>Automated business rule extraction surfaces embedded logic that no living engineer has fully documented</li>
+          <li>Graph-based dependency mapping eliminates the manual effort of tracing integration spaghetti</li>
+          <li>AI-generated documentation creates the baseline that the modernization team needs before first design sprint</li>
+        </ul>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-label">Impact on Deal Structure</div>
+        <p class="modal-text">Compressing discovery from 18 months to 60–90 days changes the cost-to-confidence ratio. The agency can see a credible roadmap before committing to a multi-year program. This de-risks the business case earlier and reduces the political exposure of the sponsoring executive.</p>
+      </div>
+    `
+  },
+  'diff-strangler': {
+    eyebrow: 'Differentiator',
+    eyebrowColor: '#4a9ede',
+    title: 'No Big Bang. No Risk Cliff.',
+    subtitle: 'The strangler-fig pattern applied to state government modernization',
+    body: `
+      <div class="modal-section">
+        <p class="modal-text">The majority of failed state modernization programs share one root cause: attempting to replace the entire system at once. A single go-live event aggregates every technical, organizational, and political risk into one moment. When it fails — and it often does — the political fallout poisons the next program for years.</p>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-label">The Strangler Fig Approach</div>
+        <p class="modal-text">Named after the fig tree that gradually surrounds and replaces its host, this pattern builds modern capabilities alongside — not instead of — the legacy system. Traffic is incrementally shifted domain by domain. The legacy system remains in production and in place until each capability is fully proven and cut over. At no point is the agency exposed to a single high-stakes cutover event.</p>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-label">Benefits in the State Context</div>
+        <ul class="modal-list">
+          <li>Constituent services remain uninterrupted throughout the modernization program</li>
+          <li>Each increment can be funded, authorized, and delivered independently</li>
+          <li>Political and procurement risk is distributed across a program of smaller, lower-risk deliveries</li>
+          <li>Teams learn and improve on each increment before tackling the highest-complexity domains</li>
+        </ul>
+      </div>
+    `
+  },
+  'diff-value': {
+    eyebrow: 'Differentiator',
+    eyebrowColor: '#3dba7e',
+    title: 'Value-Sequenced Roadmap',
+    subtitle: 'Modernization ordered by what matters most to the agency and its constituents',
+    body: `
+      <div class="modal-section">
+        <p class="modal-text">Most modernization roadmaps are sequenced by technical convenience — what is easiest to re-platform, what has the smallest integration surface, what the vendor's implementation team knows best. This prioritization serves the vendor. It does not serve the agency or its constituents.</p>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-label">Our Prioritization Framework</div>
+        <ul class="modal-list">
+          <li><strong>Constituent impact:</strong> Which capabilities, if modernized, directly reduce wait times, error rates, or access barriers for the people the agency serves?</li>
+          <li><strong>Operational pain:</strong> Where is staff time being consumed by manual workarounds, reconciliation, and error correction?</li>
+          <li><strong>Risk yield:</strong> Which systems carry the most security, compliance, or audit exposure per dollar of maintenance cost?</li>
+          <li><strong>Federal alignment:</strong> What modernization is required to maintain compliance with CMS, ACF, or DOL data exchange and reporting requirements?</li>
+        </ul>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-label">Output</div>
+        <p class="modal-text">A visual, stakeholder-ready roadmap that maps each capability increment to a specific business outcome metric — not just a technical milestone. This roadmap becomes the agency's internal justification for continued program funding and the primary artifact in annual budget requests.</p>
+      </div>
+    `
+  },
+  'diff-aws': {
+    eyebrow: 'Differentiator',
+    eyebrowColor: '#4a9ede',
+    title: 'AWS GovCloud Native',
+    subtitle: 'Infrastructure credibility and procurement friction reduction from day one',
+    body: `
+      <div class="modal-section">
+        <p class="modal-text">AWS GovCloud is FedRAMP-authorized, CJIS-compliant, and aligned to the security and data residency requirements that state agencies managing protected information require. CIOs who have already evaluated or standardized on AWS do not need to be sold on the infrastructure — they need a delivery partner who can execute on it.</p>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-label">What the AWS Partnership Enables</div>
+        <ul class="modal-list">
+          <li>Co-sell motion reduces procurement cycle time — existing state AWS contracts can often be leveraged as the vehicle</li>
+          <li>AWS account team alignment opens doors that a standalone consulting firm cannot access</li>
+          <li>Joint reference architecture publishing creates credibility with procurement and technical evaluation committees</li>
+          <li>AWS funding programs (MAP, Partner programs) can offset portions of the discovery and migration cost</li>
+        </ul>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-label">Our Role in the AWS Ecosystem</div>
+        <p class="modal-text">We extend the AWS account team into the transformation layer — the discovery, architecture, and adoption work that AWS does not deliver directly. This is a genuine gap in their coverage model, and our value in the co-sell motion is filling it with credentialed capacity.</p>
+      </div>
+    `
+  },
+  'buyer-cio': {
+    eyebrow: 'Buyer Message · Agency CIO',
+    eyebrowColor: '#e8a020',
+    title: 'Credible Roadmap. No Platform Commitment.',
+    subtitle: 'The message for the economic buyer who has been burned before',
+    body: `
+      <div class="modal-section">
+        <p class="modal-text">Agency CIOs are managing a credibility gap as much as a technology gap. Prior modernization failures have left them skeptical of vendors who lead with platforms, cautious of multi-year commitments, and politically exposed when programs go sideways. The message to this buyer must de-risk the entry point.</p>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-label">Core Message</div>
+        <p class="modal-text" style="font-style:italic;color:var(--white);font-size:0.95rem;border-left:2px solid var(--amber);padding-left:16px;">"We compress your path to a credible modernization roadmap using AI — without committing you to a platform or a multi-year contract before you know what you're buying."</p>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-label">Supporting Points</div>
+        <ul class="modal-list">
+          <li>The Discovery engagement is scoped to fit within existing discretionary authority — no legislative appropriation required to get started</li>
+          <li>The output is a roadmap the CIO owns, not a vendor's SOW — they can take it anywhere</li>
+          <li>AI-accelerated timeline means a defensible business case in one quarter, not two years</li>
+          <li>AWS partnership provides infrastructure credibility that an independent firm cannot offer</li>
+        </ul>
+      </div>
+    `
+  },
+  'buyer-program': {
+    eyebrow: 'Buyer Message · Business Program Owner',
+    eyebrowColor: '#3dba7e',
+    title: 'Outcomes First. Technical Convenience Never.',
+    subtitle: 'The internal champion who lives with the system\'s limitations every day',
+    body: `
+      <div class="modal-section">
+        <p class="modal-text">The business program owner — the Deputy Director of Benefits, the Workforce Development Director, the Child Welfare CIO — is the person who understands the operational pain most acutely. They are often the internal champion and the most frustrated stakeholder. They have been promised modernization before.</p>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-label">Core Message</div>
+        <p class="modal-text" style="font-style:italic;color:var(--white);font-size:0.95rem;border-left:2px solid var(--green);padding-left:16px;">"We sequence modernization around your highest-value outcomes first, not around what's easiest to rebuild technically."</p>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-label">Supporting Points</div>
+        <ul class="modal-list">
+          <li>Value mapping process involves business program staff directly — their operational knowledge is the primary input to prioritization</li>
+          <li>Each increment produces a measurable operational improvement, not just a new system</li>
+          <li>OCM practitioners are embedded in their teams throughout delivery, not parachuted in at go-live</li>
+          <li>Constituent impact is a first-class prioritization criterion — not a post-go-live evaluation metric</li>
+        </ul>
+      </div>
+    `
+  },
+  'buyer-cfo': {
+    eyebrow: 'Buyer Message · CFO / Procurement',
+    eyebrowColor: '#4a9ede',
+    title: 'Milestone Funding. Checkpoints, Not Phases.',
+    subtitle: 'The procurement and financial risk frame',
+    body: `
+      <div class="modal-section">
+        <p class="modal-text">State CFOs and procurement officers are managing the aftermath of programs that committed hundreds of millions over multi-year contracts and delivered little or nothing. The financial and procurement risk frame must demonstrate structural safeguards that prior programs lacked.</p>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-label">Core Message</div>
+        <p class="modal-text" style="font-style:italic;color:var(--white);font-size:0.95rem;border-left:2px solid var(--sky);padding-left:16px;">"We reduce the risk of another failed transformation by building value checkpoints into the engagement model — you fund milestones, not phases."</p>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-label">Supporting Points</div>
+        <ul class="modal-list">
+          <li>Discovery engagement is independently scoped and priced — it does not presuppose a downstream contract</li>
+          <li>Each increment in Phase 2 is structured as a discrete, measurable deliverable with defined business outcomes</li>
+          <li>Value checkpoints allow the state to pause, redirect, or stop the program without stranded investment</li>
+          <li>AWS co-sell model and existing procurement vehicles reduce legal and contracting overhead</li>
+          <li>Federal funding alignment (IRA, IIJA, CMS waivers) can offset significant portions of program cost</li>
+        </ul>
+      </div>
+    `
+  },
+  'buyer-aws': {
+    eyebrow: 'Buyer Message · AWS Partner Team',
+    eyebrowColor: '#4a9ede',
+    title: 'Extending Your GovCloud Footprint',
+    subtitle: 'The co-sell value proposition for AWS account and partner teams',
+    body: `
+      <div class="modal-section">
+        <p class="modal-text">AWS account teams in the state government vertical have strong infrastructure and platform narratives, but limited capacity to deliver the transformation layer — discovery, roadmapping, organizational change, and value-based product management. This is a structural gap in their coverage model that creates risk when agencies need more than infrastructure positioning.</p>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-label">Core Message</div>
+        <p class="modal-text" style="font-style:italic;color:var(--white);font-size:0.95rem;border-left:2px solid var(--sky);padding-left:16px;">"We extend your GovCloud footprint into the transformation layer — discovery, architecture, and adoption — that your account teams don't have capacity to deliver."</p>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-label">Co-Sell Motion</div>
+        <ul class="modal-list">
+          <li>Lead with the AI Discovery engagement as a jointly positioned offering — we bring methodology, AWS brings infrastructure credibility</li>
+          <li>Joint reference architecture for state legacy modernization (HHS or Labor vertical) as shared sales collateral</li>
+          <li>Leverage AWS MAP and partner funding programs to offset client discovery investment</li>
+          <li>First reference customer becomes a joint case study anchoring both organizations' SLED GTM</li>
+        </ul>
+      </div>
+    `
+  }
+};
+
+function openModal(key) {
+  const data = modalData[key];
+  if (!data) return;
+
+  document.getElementById('modalEyebrow').textContent = data.eyebrow;
+  document.getElementById('modalEyebrow').style.color = data.eyebrowColor;
+  document.getElementById('modalTitle').textContent = data.title;
+  document.getElementById('modalSubtitle').textContent = data.subtitle;
+  document.getElementById('modalBody').innerHTML = data.body;
+
+  document.getElementById('modalOverlay').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+function closeModalOutside(e) {
+  if (e.target === document.getElementById('modalOverlay')) closeModal();
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+});
+</script>
+</body>
+</html>
