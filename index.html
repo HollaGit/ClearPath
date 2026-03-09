@@ -7,23 +7,21 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 <style>
   :root {
-    --navy: #0b1220;
-    --navy-mid: #111d30;
-    --navy-light: #182640;
-    --border: rgba(255,255,255,0.07);
-    --amber: #e8a020;
-    --amber-dim: rgba(232,160,32,0.15);
-    --amber-glow: rgba(232,160,32,0.06);
-    --sky: #4a9ede;
-    --sky-dim: rgba(74,158,222,0.12);
-    --text: #d4dbe8;
-    --text-muted: #7a8ba0;
-    --white: #f0f4f8;
-    --green: #3dba7e;
+    --navy: #071033;
+    --navy-mid: #0d1840;
+    --navy-light: #142058;
+    --border: rgba(255,255,255,0.08);
+    --amber: #E8501C;
+    --amber-dim: rgba(232,80,28,0.15);
+    --amber-glow: rgba(232,80,28,0.06);
+    --sky: #4464E8;
+    --sky-dim: rgba(68,100,232,0.14);
+    --text: #cfd7f0;
+    --text-muted: #6878a8;
+    --white: #f0f2ff;
+    --green: #9B5EC8;
   }
-
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
   body {
     background: var(--navy);
     color: var(--text);
@@ -31,8 +29,6 @@
     min-height: 100vh;
     overflow-x: hidden;
   }
-
-  /* Grain overlay */
   body::before {
     content: '';
     position: fixed;
@@ -42,20 +38,17 @@
     z-index: 0;
     opacity: 0.4;
   }
-
-  /* Subtle grid background */
   body::after {
     content: '';
     position: fixed;
     inset: 0;
-    background-image: 
-      linear-gradient(rgba(74,158,222,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(74,158,222,0.03) 1px, transparent 1px);
+    background-image:
+      linear-gradient(rgba(68,100,232,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(68,100,232,0.04) 1px, transparent 1px);
     background-size: 40px 40px;
     pointer-events: none;
     z-index: 0;
   }
-
   .page {
     position: relative;
     z-index: 1;
@@ -63,8 +56,6 @@
     margin: 0 auto;
     padding: 40px 32px 60px;
   }
-
-  /* ─── HEADER ─── */
   header {
     display: grid;
     grid-template-columns: 1fr auto;
@@ -75,13 +66,11 @@
     margin-bottom: 44px;
     animation: fadeUp 0.6s ease both;
   }
-
   .brand {
     display: flex;
     align-items: center;
     gap: 14px;
   }
-
   .brand-mark {
     width: 42px;
     height: 42px;
@@ -91,25 +80,20 @@
     justify-content: center;
     position: relative;
   }
-
   .brand-mark::before {
     content: '';
     position: absolute;
     inset: 4px;
     background: var(--amber-dim);
   }
-
   .brand-mark svg { position: relative; z-index: 1; }
-
   .brand-name {
     font-family: 'DM Serif Display', serif;
     font-size: 1.5rem;
     letter-spacing: -0.01em;
     color: var(--white);
   }
-
   .brand-name span { color: var(--amber); }
-
   .header-badges {
     display: flex;
     gap: 8px;
@@ -117,7 +101,6 @@
     flex-wrap: wrap;
     justify-content: flex-end;
   }
-
   .badge {
     font-family: 'DM Mono', monospace;
     font-size: 0.62rem;
@@ -128,19 +111,15 @@
     color: var(--text-muted);
     background: rgba(255,255,255,0.02);
   }
-
   .badge.highlight {
     border-color: var(--amber);
     color: var(--amber);
     background: var(--amber-dim);
   }
-
-  /* ─── HEADLINE ─── */
   .headline-block {
     margin-bottom: 48px;
     animation: fadeUp 0.6s 0.1s ease both;
   }
-
   .eyebrow {
     font-family: 'DM Mono', monospace;
     font-size: 0.65rem;
@@ -149,7 +128,6 @@
     color: var(--amber);
     margin-bottom: 14px;
   }
-
   h1 {
     font-family: 'DM Serif Display', serif;
     font-size: clamp(2rem, 4.5vw, 3.2rem);
@@ -159,23 +137,22 @@
     max-width: 720px;
     margin-bottom: 20px;
   }
-
   h1 em {
     font-style: italic;
-    color: var(--sky);
+    background: linear-gradient(90deg, #E8501C, #9B5EC8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
-
   .subhead {
     font-size: 0.95rem;
     line-height: 1.75;
     color: var(--text-muted);
     max-width: 580px;
   }
-
-  /* ─── PROBLEM STRIP ─── */
   .problem-strip {
-    background: linear-gradient(135deg, rgba(232,160,32,0.06) 0%, transparent 60%);
-    border: 1px solid rgba(232,160,32,0.2);
+    background: linear-gradient(135deg, rgba(232,80,28,0.07) 0%, transparent 60%);
+    border: 1px solid rgba(232,80,28,0.2);
     border-left: 3px solid var(--amber);
     padding: 20px 28px;
     margin-bottom: 48px;
@@ -186,12 +163,10 @@
     transition: background 0.2s, border-color 0.2s;
     animation: fadeUp 0.6s 0.15s ease both;
   }
-
   .problem-strip:hover {
-    background: linear-gradient(135deg, rgba(232,160,32,0.1) 0%, transparent 60%);
+    background: linear-gradient(135deg, rgba(232,80,28,0.12) 0%, transparent 60%);
     border-color: var(--amber);
   }
-
   .problem-strip .ps-label {
     font-family: 'DM Mono', monospace;
     font-size: 0.6rem;
@@ -201,21 +176,18 @@
     white-space: nowrap;
     min-width: 80px;
   }
-
   .problem-strip .ps-divider {
     width: 1px;
     height: 28px;
     background: rgba(232,160,32,0.3);
     flex-shrink: 0;
   }
-
   .problem-strip .ps-text {
     font-size: 0.85rem;
     color: var(--text);
     font-style: italic;
     line-height: 1.6;
   }
-
   .problem-strip .ps-cta {
     margin-left: auto;
     font-family: 'DM Mono', monospace;
@@ -227,10 +199,7 @@
     align-items: center;
     gap: 6px;
   }
-
   .ps-cta::after { content: '→'; }
-
-  /* ─── OFFERING GRID ─── */
   .section-label {
     font-family: 'DM Mono', monospace;
     font-size: 0.62rem;
@@ -239,7 +208,6 @@
     color: var(--text-muted);
     margin-bottom: 20px;
   }
-
   .offering-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -247,7 +215,6 @@
     margin-bottom: 48px;
     animation: fadeUp 0.6s 0.2s ease both;
   }
-
   .offer-card {
     background: var(--navy-mid);
     border: 1px solid var(--border);
@@ -257,7 +224,6 @@
     position: relative;
     overflow: hidden;
   }
-
   .offer-card::before {
     content: '';
     position: absolute;
@@ -266,19 +232,15 @@
     transition: opacity 0.25s;
     opacity: 0;
   }
-
   .offer-card:nth-child(1)::before { background: var(--amber); }
   .offer-card:nth-child(2)::before { background: var(--sky); }
   .offer-card:nth-child(3)::before { background: var(--green); }
-
   .offer-card:hover {
     border-color: rgba(255,255,255,0.15);
     transform: translateY(-3px);
     background: var(--navy-light);
   }
-
   .offer-card:hover::before { opacity: 1; }
-
   .card-num {
     font-family: 'DM Mono', monospace;
     font-size: 0.58rem;
@@ -286,7 +248,6 @@
     color: var(--text-muted);
     margin-bottom: 16px;
   }
-
   .card-icon {
     width: 36px;
     height: 36px;
@@ -295,9 +256,7 @@
     align-items: center;
     justify-content: center;
   }
-
   .card-icon svg { width: 100%; height: 100%; }
-
   .card-title {
     font-family: 'DM Serif Display', serif;
     font-size: 1.15rem;
@@ -305,14 +264,12 @@
     line-height: 1.2;
     margin-bottom: 10px;
   }
-
   .card-tagline {
     font-size: 0.78rem;
     color: var(--text-muted);
     line-height: 1.6;
     font-style: italic;
   }
-
   .card-footer {
     margin-top: 20px;
     padding-top: 14px;
@@ -321,23 +278,18 @@
     justify-content: space-between;
     align-items: center;
   }
-
   .card-phase {
     font-family: 'DM Mono', monospace;
     font-size: 0.58rem;
     letter-spacing: 0.08em;
     color: var(--text-muted);
   }
-
   .card-arrow {
     font-size: 0.7rem;
     color: var(--text-muted);
     transition: transform 0.2s, color 0.2s;
   }
-
   .offer-card:hover .card-arrow { transform: translate(3px, -3px); color: var(--white); }
-
-  /* ─── DIFFERENTIATION ROW ─── */
   .diff-row {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -345,7 +297,6 @@
     margin-bottom: 48px;
     animation: fadeUp 0.6s 0.25s ease both;
   }
-
   .diff-card {
     background: rgba(255,255,255,0.02);
     border: 1px solid var(--border);
@@ -353,17 +304,14 @@
     cursor: pointer;
     transition: all 0.2s;
   }
-
   .diff-card:hover {
     background: rgba(255,255,255,0.04);
     border-color: rgba(255,255,255,0.12);
   }
-
   .diff-card .diff-icon {
     font-size: 1.1rem;
     margin-bottom: 10px;
   }
-
   .diff-card .diff-title {
     font-family: 'DM Mono', monospace;
     font-size: 0.68rem;
@@ -371,38 +319,30 @@
     color: var(--white);
     margin-bottom: 6px;
   }
-
   .diff-card .diff-text {
     font-size: 0.73rem;
     color: var(--text-muted);
     line-height: 1.55;
   }
-
-  /* ─── BUYER TABLE ─── */
   .buyer-section {
     margin-bottom: 48px;
     animation: fadeUp 0.6s 0.3s ease both;
   }
-
   .buyer-table {
     width: 100%;
     border-collapse: collapse;
   }
-
   .buyer-table tr {
     border-bottom: 1px solid var(--border);
     cursor: pointer;
     transition: background 0.15s;
   }
-
   .buyer-table tr:hover { background: rgba(255,255,255,0.02); }
-
   .buyer-table td {
     padding: 14px 16px;
     font-size: 0.82rem;
     vertical-align: middle;
   }
-
   .buyer-table td:first-child {
     font-family: 'DM Mono', monospace;
     font-size: 0.65rem;
@@ -411,14 +351,11 @@
     width: 180px;
     white-space: nowrap;
   }
-
   .buyer-table td:last-child {
     color: var(--text-muted);
     font-style: italic;
     border-left: 1px solid var(--border);
   }
-
-  /* ─── FOOTER ─── */
   footer {
     border-top: 1px solid var(--border);
     padding-top: 24px;
@@ -427,7 +364,6 @@
     align-items: center;
     animation: fadeUp 0.6s 0.35s ease both;
   }
-
   .footer-left {
     font-family: 'DM Mono', monospace;
     font-size: 0.6rem;
@@ -435,13 +371,11 @@
     color: var(--text-muted);
     text-transform: uppercase;
   }
-
   .footer-right {
     display: flex;
     gap: 6px;
     align-items: center;
   }
-
   .aws-badge {
     font-family: 'DM Mono', monospace;
     font-size: 0.6rem;
@@ -451,8 +385,6 @@
     padding: 4px 10px;
     background: var(--sky-dim);
   }
-
-  /* ─── MODAL ─── */
   .modal-overlay {
     position: fixed;
     inset: 0;
@@ -467,12 +399,10 @@
     pointer-events: none;
     transition: opacity 0.25s;
   }
-
   .modal-overlay.active {
     opacity: 1;
     pointer-events: all;
   }
-
   .modal {
     background: var(--navy-mid);
     border: 1px solid rgba(255,255,255,0.1);
@@ -484,9 +414,7 @@
     transform: translateY(16px) scale(0.98);
     transition: transform 0.25s;
   }
-
   .modal-overlay.active .modal { transform: translateY(0) scale(1); }
-
   .modal-top {
     padding: 28px 28px 0;
     position: sticky;
@@ -496,7 +424,6 @@
     border-bottom: 1px solid var(--border);
     padding-bottom: 20px;
   }
-
   .modal-close {
     position: absolute;
     top: 20px;
@@ -513,16 +440,13 @@
     justify-content: center;
     transition: all 0.15s;
   }
-
   .modal-close:hover {
     border-color: var(--white);
     color: var(--white);
   }
-
   .modal-body {
     padding: 28px;
   }
-
   .modal-eyebrow {
     font-family: 'DM Mono', monospace;
     font-size: 0.6rem;
@@ -530,7 +454,6 @@
     text-transform: uppercase;
     margin-bottom: 10px;
   }
-
   .modal-title {
     font-family: 'DM Serif Display', serif;
     font-size: 1.6rem;
@@ -539,17 +462,14 @@
     letter-spacing: -0.01em;
     margin-bottom: 6px;
   }
-
   .modal-subtitle {
     font-size: 0.82rem;
     color: var(--text-muted);
     font-style: italic;
   }
-
   .modal-section {
     margin-top: 24px;
   }
-
   .modal-section-label {
     font-family: 'DM Mono', monospace;
     font-size: 0.6rem;
@@ -558,18 +478,15 @@
     color: var(--text-muted);
     margin-bottom: 12px;
   }
-
   .modal-text {
     font-size: 0.85rem;
     line-height: 1.75;
     color: var(--text);
   }
-
   .modal-list {
     list-style: none;
     margin-top: 10px;
   }
-
   .modal-list li {
     font-size: 0.83rem;
     line-height: 1.6;
@@ -578,9 +495,7 @@
     border-bottom: 1px solid var(--border);
     position: relative;
   }
-
   .modal-list li:last-child { border-bottom: none; }
-
   .modal-list li::before {
     content: '—';
     position: absolute;
@@ -588,21 +503,18 @@
     color: var(--text-muted);
     font-size: 0.75rem;
   }
-
   .modal-metric-row {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 12px;
     margin-top: 16px;
   }
-
   .modal-metric {
     background: rgba(255,255,255,0.03);
     border: 1px solid var(--border);
     padding: 14px;
     text-align: center;
   }
-
   .modal-metric .m-val {
     font-family: 'DM Serif Display', serif;
     font-size: 1.6rem;
@@ -610,7 +522,6 @@
     display: block;
     margin-bottom: 4px;
   }
-
   .modal-metric .m-label {
     font-family: 'DM Mono', monospace;
     font-size: 0.58rem;
@@ -618,14 +529,12 @@
     color: var(--text-muted);
     text-transform: uppercase;
   }
-
   .tag-row {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
     margin-top: 12px;
   }
-
   .tag {
     font-family: 'DM Mono', monospace;
     font-size: 0.6rem;
@@ -635,17 +544,13 @@
     color: var(--text-muted);
     background: rgba(255,255,255,0.02);
   }
-
   .tag.accent { border-color: var(--amber); color: var(--amber); background: var(--amber-dim); }
   .tag.sky { border-color: var(--sky); color: var(--sky); background: var(--sky-dim); }
-  .tag.green { border-color: var(--green); color: var(--green); background: rgba(61,186,126,0.1); }
-
-  /* ─── ANIMATIONS ─── */
+  .tag.green { border-color: var(--green); color: var(--green); background: rgba(155,94,200,0.12); }
   @keyframes fadeUp {
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
   }
-
   @media (max-width: 768px) {
     .offering-grid { grid-template-columns: 1fr; }
     .diff-row { grid-template-columns: 1fr 1fr; }
@@ -657,16 +562,13 @@
 </style>
 </head>
 <body>
-
 <div class="page">
-
-  <!-- HEADER -->
   <header>
     <div class="brand">
       <div class="brand-mark">
         <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-          <path d="M9 2L16 14H2L9 2Z" stroke="#e8a020" stroke-width="1.2" fill="none"/>
-          <path d="M9 6L13 12H5L9 6Z" fill="#e8a020" opacity="0.4"/>
+          <path d="M9 2L16 14H2L9 2Z" stroke="#E8501C" stroke-width="1.2" fill="none"/>
+          <path d="M9 6L13 12H5L9 6Z" fill="#E8501C" opacity="0.4"/>
         </svg>
       </div>
       <div>
@@ -680,14 +582,12 @@
     </div>
   </header>
 
-  <!-- HEADLINE -->
   <div class="headline-block">
     <div class="eyebrow">End-to-End Modernization Services · Western US State Agencies</div>
     <h1>Legacy systems are costing you<br><em>more than money.</em></h1>
     <p class="subhead">We partner with AWS to help state agencies compress the path from aging core systems to a modern, value-sequenced application and data estate — using AI to collapse discovery timelines and behavioral science to protect adoption.</p>
   </div>
 
-  <!-- PROBLEM STRIP -->
   <div class="problem-strip" onclick="openModal('problem')">
     <div class="ps-label">The Problem</div>
     <div class="ps-divider"></div>
@@ -695,18 +595,16 @@
     <div class="ps-cta">Explore the problem</div>
   </div>
 
-  <!-- OFFERING CARDS -->
   <div class="section-label">Our Three-Layer Offering</div>
   <div class="offering-grid">
-
     <div class="offer-card" onclick="openModal('discovery')">
       <div class="card-num">01 / BEACHHEAD ENGAGEMENT</div>
       <div class="card-icon">
         <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect x="2" y="2" width="32" height="32" rx="0" stroke="#e8a020" stroke-width="1" opacity="0.3"/>
-          <path d="M8 28L14 18L20 22L28 10" stroke="#e8a020" stroke-width="1.5" stroke-linecap="round"/>
-          <circle cx="28" cy="10" r="2.5" fill="#e8a020" opacity="0.7"/>
-          <path d="M8 10H14M8 14H12M8 18H10" stroke="#e8a020" stroke-width="1" opacity="0.4"/>
+          <rect x="2" y="2" width="32" height="32" rx="0" stroke="#E8501C" stroke-width="1" opacity="0.3"/>
+          <path d="M8 28L14 18L20 22L28 10" stroke="#E8501C" stroke-width="1.5" stroke-linecap="round"/>
+          <circle cx="28" cy="10" r="2.5" fill="#E8501C" opacity="0.7"/>
+          <path d="M8 10H14M8 14H12M8 18H10" stroke="#E8501C" stroke-width="1" opacity="0.4"/>
         </svg>
       </div>
       <div class="card-title">AI-Accelerated Discovery & Value Mapping</div>
@@ -716,16 +614,15 @@
         <span class="card-arrow">↗</span>
       </div>
     </div>
-
     <div class="offer-card" onclick="openModal('architecture')">
       <div class="card-num">02 / CORE DELIVERY</div>
       <div class="card-icon">
         <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect x="2" y="2" width="32" height="32" stroke="#4a9ede" stroke-width="1" opacity="0.3"/>
-          <rect x="7" y="14" width="8" height="8" stroke="#4a9ede" stroke-width="1.2" fill="none"/>
-          <rect x="21" y="14" width="8" height="8" stroke="#4a9ede" stroke-width="1.2" fill="rgba(74,158,222,0.15)"/>
-          <rect x="14" y="7" width="8" height="8" stroke="#4a9ede" stroke-width="1.2" fill="none" opacity="0.5"/>
-          <path d="M15 18H21M11 14V11H18M25 14V11H18" stroke="#4a9ede" stroke-width="1" opacity="0.6"/>
+          <rect x="2" y="2" width="32" height="32" stroke="#4464E8" stroke-width="1" opacity="0.3"/>
+          <rect x="7" y="14" width="8" height="8" stroke="#4464E8" stroke-width="1.2" fill="none"/>
+          <rect x="21" y="14" width="8" height="8" stroke="#4464E8" stroke-width="1.2" fill="rgba(68,100,232,0.15)"/>
+          <rect x="14" y="7" width="8" height="8" stroke="#4464E8" stroke-width="1.2" fill="none" opacity="0.5"/>
+          <path d="M15 18H21M11 14V11H18M25 14V11H18" stroke="#4464E8" stroke-width="1" opacity="0.6"/>
         </svg>
       </div>
       <div class="card-title">Modern Cloud Architecture on AWS</div>
@@ -735,15 +632,14 @@
         <span class="card-arrow">↗</span>
       </div>
     </div>
-
     <div class="offer-card" onclick="openModal('ocm')">
       <div class="card-num">03 / CONTINUOUS DISCIPLINE</div>
       <div class="card-icon">
         <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect x="2" y="2" width="32" height="32" stroke="#3dba7e" stroke-width="1" opacity="0.3"/>
-          <circle cx="18" cy="15" r="5" stroke="#3dba7e" stroke-width="1.2" fill="none"/>
-          <path d="M10 28C10 23.58 13.58 20 18 20C22.42 20 26 23.58 26 28" stroke="#3dba7e" stroke-width="1.2" fill="none"/>
-          <path d="M22 13L24 11M26 9L24 11" stroke="#3dba7e" stroke-width="1" stroke-linecap="round"/>
+          <rect x="2" y="2" width="32" height="32" stroke="#9B5EC8" stroke-width="1" opacity="0.3"/>
+          <circle cx="18" cy="15" r="5" stroke="#9B5EC8" stroke-width="1.2" fill="none"/>
+          <path d="M10 28C10 23.58 13.58 20 18 20C22.42 20 26 23.58 26 28" stroke="#9B5EC8" stroke-width="1.2" fill="none"/>
+          <path d="M22 13L24 11M26 9L24 11" stroke="#9B5EC8" stroke-width="1" stroke-linecap="round"/>
         </svg>
       </div>
       <div class="card-title">Behavioral OCM & Adoption as Product</div>
@@ -753,40 +649,32 @@
         <span class="card-arrow">↗</span>
       </div>
     </div>
-
   </div>
 
-  <!-- DIFFERENTIATORS -->
   <div class="section-label">Why We Win</div>
   <div class="diff-row">
-
     <div class="diff-card" onclick="openModal('diff-ai')">
       <div class="diff-icon">⚡</div>
       <div class="diff-title">AI-First Discovery</div>
       <div class="diff-text">LLM-assisted code analysis, business rule extraction, and dependency mapping compresses the most expensive phase of modernization.</div>
     </div>
-
     <div class="diff-card" onclick="openModal('diff-strangler')">
       <div class="diff-icon">🏗</div>
       <div class="diff-title">No Big Bang Risk</div>
       <div class="diff-text">Strangler-fig architecture means your legacy system stays in production while modern capabilities are built alongside it — incrementally.</div>
     </div>
-
     <div class="diff-card" onclick="openModal('diff-value')">
       <div class="diff-icon">◎</div>
       <div class="diff-title">Value-Sequenced Roadmap</div>
       <div class="diff-text">We prioritize what to modernize first by constituent impact and operational pain, not technical convenience or vendor preference.</div>
     </div>
-
     <div class="diff-card" onclick="openModal('diff-aws')">
       <div class="diff-icon">☁</div>
       <div class="diff-title">AWS GovCloud Native</div>
       <div class="diff-text">FedRAMP compliance, existing state procurement vehicles, and co-sell economics reduce friction from first conversation to contract.</div>
     </div>
-
   </div>
 
-  <!-- BUYER MESSAGES -->
   <div class="buyer-section">
     <div class="section-label">What We Say to Whom</div>
     <table class="buyer-table">
@@ -809,7 +697,6 @@
     </table>
   </div>
 
-  <!-- FOOTER -->
   <footer>
     <div class="footer-left">Pariveda Partners · SLED West Region · 2025</div>
     <div class="footer-right">
@@ -817,11 +704,8 @@
       <span class="badge">GovCloud Ready</span>
     </div>
   </footer>
-
 </div>
 
-
-<!-- MODAL OVERLAY -->
 <div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
   <div class="modal" id="modal">
     <div class="modal-top">
@@ -834,12 +718,11 @@
   </div>
 </div>
 
-
 <script>
 const modalData = {
   problem: {
     eyebrow: 'Context',
-    eyebrowColor: '#e8a020',
+    eyebrowColor: '#E8501C',
     title: 'The Legacy Crisis in State Government',
     subtitle: 'Why this moment is different from the last ten years',
     body: `
@@ -869,7 +752,7 @@ const modalData = {
   },
   discovery: {
     eyebrow: 'Offering Layer 01 · Beachhead Engagement',
-    eyebrowColor: '#e8a020',
+    eyebrowColor: '#E8501C',
     title: 'AI-Accelerated Discovery & Value Mapping',
     subtitle: '60–90 day engagement that produces the artifact that justifies everything else',
     body: `
@@ -978,7 +861,7 @@ const modalData = {
   },
   'diff-ai': {
     eyebrow: 'Differentiator',
-    eyebrowColor: '#e8a020',
+    eyebrowColor: '#E8501C',
     title: 'AI-First Discovery',
     subtitle: 'The economics of legacy modernization have fundamentally changed',
     body: `
@@ -1074,7 +957,7 @@ const modalData = {
   },
   'buyer-cio': {
     eyebrow: 'Buyer Message · Agency CIO',
-    eyebrowColor: '#e8a020',
+    eyebrowColor: '#E8501C',
     title: 'Credible Roadmap. No Platform Commitment.',
     subtitle: 'The message for the economic buyer who has been burned before',
     body: `
@@ -1083,7 +966,7 @@ const modalData = {
       </div>
       <div class="modal-section">
         <div class="modal-section-label">Core Message</div>
-        <p class="modal-text" style="font-style:italic;color:var(--white);font-size:0.95rem;border-left:2px solid var(--amber);padding-left:16px;">"We compress your path to a credible modernization roadmap using AI — without committing you to a platform or a multi-year contract before you know what you're buying."</p>
+        <p class="modal-text" style="font-style:italic;color:var(--white);font-size:0.95rem;border-left:2px solid #E8501C;padding-left:16px;">"We compress your path to a credible modernization roadmap using AI — without committing you to a platform or a multi-year contract before you know what you're buying."</p>
       </div>
       <div class="modal-section">
         <div class="modal-section-label">Supporting Points</div>
@@ -1100,14 +983,14 @@ const modalData = {
     eyebrow: 'Buyer Message · Business Program Owner',
     eyebrowColor: '#3dba7e',
     title: 'Outcomes First. Technical Convenience Never.',
-    subtitle: 'The internal champion who lives with the system\'s limitations every day',
+    subtitle: "The internal champion who lives with the system's limitations every day",
     body: `
       <div class="modal-section">
         <p class="modal-text">The business program owner — the Deputy Director of Benefits, the Workforce Development Director, the Child Welfare CIO — is the person who understands the operational pain most acutely. They are often the internal champion and the most frustrated stakeholder. They have been promised modernization before.</p>
       </div>
       <div class="modal-section">
         <div class="modal-section-label">Core Message</div>
-        <p class="modal-text" style="font-style:italic;color:var(--white);font-size:0.95rem;border-left:2px solid var(--green);padding-left:16px;">"We sequence modernization around your highest-value outcomes first, not around what's easiest to rebuild technically."</p>
+        <p class="modal-text" style="font-style:italic;color:var(--white);font-size:0.95rem;border-left:2px solid #9B5EC8;padding-left:16px;">"We sequence modernization around your highest-value outcomes first, not around what's easiest to rebuild technically."</p>
       </div>
       <div class="modal-section">
         <div class="modal-section-label">Supporting Points</div>
@@ -1174,26 +1057,21 @@ const modalData = {
 function openModal(key) {
   const data = modalData[key];
   if (!data) return;
-
   document.getElementById('modalEyebrow').textContent = data.eyebrow;
   document.getElementById('modalEyebrow').style.color = data.eyebrowColor;
   document.getElementById('modalTitle').textContent = data.title;
   document.getElementById('modalSubtitle').textContent = data.subtitle;
   document.getElementById('modalBody').innerHTML = data.body;
-
   document.getElementById('modalOverlay').classList.add('active');
   document.body.style.overflow = 'hidden';
 }
-
 function closeModal() {
   document.getElementById('modalOverlay').classList.remove('active');
   document.body.style.overflow = '';
 }
-
 function closeModalOutside(e) {
   if (e.target === document.getElementById('modalOverlay')) closeModal();
 }
-
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') closeModal();
 });
